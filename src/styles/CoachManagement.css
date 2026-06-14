@@ -1,0 +1,192 @@
+/* Coach Management Component */
+
+.coach-management {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.coach-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  align-items: end;
+}
+
+.coach-form input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.coach-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.coach-form button {
+  padding: 0.75rem 1.5rem;
+}
+
+.month-selector {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f0f4ff;
+  border-radius: 4px;
+}
+
+.month-selector label {
+  font-weight: 600;
+  color: #333;
+}
+
+.month-selector select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.coaches-list {
+  margin-top: 2rem;
+}
+
+.coaches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.coach-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.coach-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.coach-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.coach-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+}
+
+.coach-info p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.stat {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.stat .label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.stat .value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.stat .present {
+  color: #48bb78;
+}
+
+.stat .absent {
+  color: #f56565;
+}
+
+.stat .leave {
+  color: #ed8936;
+}
+
+.stat .percentage {
+  color: #667eea;
+}
+
+.coach-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+}
+
+.coach-actions .btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .coach-form {
+    grid-template-columns: 1fr;
+  }
+
+  .month-selector {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .coaches-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .coach-actions {
+    flex-direction: column;
+  }
+
+  .coach-actions .btn {
+    width: 100%;
+  }
+}
