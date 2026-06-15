@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { studentService, attendanceService, paymentService } from '../services/supabaseService';
-import type { StudentStats } from '../types/database';
+import type { StudentStats, StudentAttendance } from '../types/database';
 import '../styles/AttendanceTracker.css';
 
 export function AttendanceTracker() {
   const [studentStats, setStudentStats] = useState<StudentStats[]>([]);
+  const [attendanceByPayment, setAttendanceByPayment] = useState<Record<string, StudentAttendance[]>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
@@ -23,7 +24,23 @@ export function AttendanceTracker() {
         students.map(s => studentService.getStudentStats(s.id))
       );
 
-      setStudentStats(stats.filter(s => s.currentPayment !== null));
+      const activeStats = stats.filter(s => s.currentPayment !== null);
+      setStudentStats(activeStats);
+
+      const attendanceEntries = await Promise.all(
+        activeStats.map(async (s) => {
+          const paymentId = s.currentPayment!.id;
+          const records = await attendanceService.getPaymentAttendance(paymentId);
+          return [paymentId, records] as const;
+        })
+      );
+
+      const attendanceMap: Record<string, StudentAttendance[]> = {};
+      attendanceEntries.forEach(([paymentId, records]) => {
+        attendanceMap[paymentId] = records;
+      });
+
+      setAttendanceByPayment(attendanceMap);
     } catch (err) {
       setError('Failed to load student stats: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
@@ -73,6 +90,16 @@ export function AttendanceTracker() {
   if (loading && studentStats.length === 0) {
     return <div className="loading">Loading attendance data...</div>;
   }
+
+  const getSessionDate = (paymentId: string, sessionNumber: number) => {
+    const records = attendanceByPayment[paymentId] || [];
+    const record = records.find(
+      (r) => r.session_number === sessionNumber && r.status === 'present'
+    );
+
+    if (!record) return null;
+    return new Date(record.attendance_date).toLocaleDateString();
+  };
 
   return (
     <div className="attendance-tracker">
@@ -131,7 +158,8 @@ export function AttendanceTracker() {
                       <div className="sessions-grid">
                         {Array.from({ length: 8 }).map((_, i) => {
                           const sessionNum = i + 1;
-                          const isCompleted = sessionNum <= stat.completedSessions;
+                          const sessionDate = getSessionDate(stat.currentPayment!.id, sessionNum);
+                          const isCompleted = sessionDate !== null;
 
                           return (
                             <button
@@ -146,12 +174,29 @@ export function AttendanceTracker() {
                                 )
                               }
                               disabled={loading || isCompleted}
-                              title={`Session ${sessionNum}`}
+                              title={
+                                isCompleted
+                                  ? `Session ${sessionNum} attended on ${sessionDate}`
+                                  : `Session ${sessionNum}`
+                              }
                             >
                               {isCompleted ? '✓' : sessionNum}
                             </button>
                           );
                         })}
+                      </div>
+
+                      <div className="payment-info">
+                        <p><strong>Session Attendance Dates:</strong></p>
+                        {Array.from({ length: 8 })
+                          .map((_, i) => i + 1)
+                          .filter((sessionNum) => getSessionDate(stat.currentPayment!.id, sessionNum))
+                          .map((sessionNum) => (
+                            <p key={sessionNum}>
+                              Session {sessionNum}: {getSessionDate(stat.currentPayment!.id, sessionNum)}
+                            </p>
+                          ))}
+                        {stat.completedSessions === 0 && <p>No attendance marked yet.</p>}
                       </div>
 
                       {stat.isPaymentDue && (
